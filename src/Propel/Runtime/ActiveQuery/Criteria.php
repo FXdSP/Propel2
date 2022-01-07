@@ -1607,9 +1607,9 @@ class Criteria
     /**
      * Get the query comment, that appears after the first verb in the SQL query
      *
-     * @return string The comment to add to the query, without comment sign
+     * @return string|null The comment to add to the query, without comment sign
      */
-    public function getComment(): string
+    public function getComment(): ?string
     {
         return $this->queryComment;
     }

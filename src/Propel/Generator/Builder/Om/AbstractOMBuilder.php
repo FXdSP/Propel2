@@ -33,21 +33,21 @@ abstract class AbstractOMBuilder extends DataModelBuilder
      * Declared fully qualified classnames, to build the 'namespace' statements
      * according to this table's namespace.
      *
-     * @var array
+     * @var array<string, array<string, string>>
      */
     protected $declaredClasses = [];
 
     /**
      * Mapping between fully qualified classnames and their short classname or alias
      *
-     * @var array
+     * @var array<string, string>
      */
     protected $declaredShortClassesOrAlias = [];
 
     /**
      * List of classes that can be use without alias when model don't have namespace
      *
-     * @var array
+     * @var array<string>
      */
     protected $whiteListOfDeclaredClasses = ['PDO', 'Exception', 'DateTime'];
 
@@ -199,11 +199,11 @@ abstract class AbstractOMBuilder extends DataModelBuilder
      *
      * @return string
      */
-    public function getPackage(): string
+    public function getPackage(): ?string
     {
         $pkg = ($this->getTable()->getPackage() ?: $this->getDatabase()->getPackage());
         if (!$pkg) {
-            $pkg = $this->getBuildProperty('generator.targetPackage');
+            $pkg = (string)$this->getBuildProperty('generator.targetPackage');
         }
 
         return $pkg;
@@ -253,7 +253,7 @@ abstract class AbstractOMBuilder extends DataModelBuilder
      *
      * @return string ClassName, Alias or FQCN
      */
-    public function getClassNameFromBuilder($builder, $fqcn = false): string
+    public function getClassNameFromBuilder($builder, bool $fqcn = false): string
     {
         if ($fqcn) {
             return $builder->getFullyQualifiedClassName();
@@ -289,7 +289,7 @@ abstract class AbstractOMBuilder extends DataModelBuilder
     }
 
     /**
-     * Declare a class to be use and return it's name or it's alias
+     * Declare a class to be use and return its name or its alias
      *
      * @param string $class the class name
      * @param string $namespace the namespace
@@ -297,17 +297,14 @@ abstract class AbstractOMBuilder extends DataModelBuilder
      *
      * @throws \Propel\Generator\Exception\LogicException
      *
-     * @return string the class name or it's alias
+     * @return string The class name or its alias
      */
     public function declareClassNamespace($class, $namespace = '', $alias = false): string
     {
         $namespace = trim($namespace, '\\');
 
         // check if the class is already declared
-        if (
-            isset($this->declaredClasses[$namespace])
-            && isset($this->declaredClasses[$namespace][$class])
-        ) {
+        if (isset($this->declaredClasses[$namespace][$class])) {
             return $this->declaredClasses[$namespace][$class];
         }
 
@@ -322,10 +319,6 @@ abstract class AbstractOMBuilder extends DataModelBuilder
         }
 
         if (!$forcedAlias && !isset($this->declaredShortClassesOrAlias[$aliasWanted])) {
-            if (!isset($this->declaredClasses[$namespace])) {
-                $this->declaredClasses[$namespace] = [];
-            }
-
             $this->declaredClasses[$namespace][$class] = $aliasWanted;
             $this->declaredShortClassesOrAlias[$aliasWanted] = $namespace . '\\' . $class;
 

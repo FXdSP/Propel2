@@ -146,9 +146,9 @@ abstract class ScopedMappingModel extends MappingModel
     /**
      * Returns the package name.
      *
-     * @return string
+     * @return string|null
      */
-    public function getPackage(): string
+    public function getPackage(): ?string
     {
         return $this->package;
     }
